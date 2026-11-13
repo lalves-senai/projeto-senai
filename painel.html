@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão Escolar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #e0e7ff;
+            --warning: #f59e0b;
+            --warning-hover: #d97706;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --background: #f1f5f9;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Barra Superior de Usuário */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            font-size: 0.875rem;
+        }
+
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .user-status strong {
+            color: var(--text-main);
+        }
+
+        .btn-logout {
+            background-color: #fef2f2;
+            color: var(--danger-hover);
+            border: 1px solid #fecaca;
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
+            font-size: 0.825rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 0.25rem;
+        }
+
+        header h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Navegação por Abas */
+        .tabs-navigation {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            background: #e2e8f0;
+            padding: 0.35rem;
+            border-radius: var(--radius-md);
+            max-width: 680px;
+            margin: 0 auto 0.5rem auto;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 130px;
+            padding: 0.65rem 1rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--surface);
+            color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .forms-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 840px) {
+            .forms-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--surface);
+            padding: 1.75rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-header-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+        }
+
+        .form-group {
+            margin-bottom: 1.1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s ease;
+            background-color: #fafafa;
+        }
+
+        input:focus {
+            background-color: var(--surface);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-cancel {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            margin-top: 0.5rem;
+        }
+
+        .btn-cancel:hover {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        .list-section h2 {
+            margin-bottom: 1rem;
+        }
+
+        .item-card {
+            background: var(--surface);
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 0.85rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .item-card:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .item-info-block {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-id {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .item-details {
+            display: flex;
+            gap: 1.25rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .item-details span {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            width: auto;
+            padding: 0.45rem 0.85rem;
+            font-size: 0.85rem;
+            border-radius: 6px;
+        }
+
+        .btn-edit {
+            background-color: #fffbeb;
+            color: var(--warning-hover);
+            border: 1px solid #fde68a;
+        }
+
+        .btn-edit:hover {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: #fef2f2;
+            color: var(--danger-hover);
+            border: 1px solid #fecaca;
+        }
+
+        .btn-delete:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .resultado-busca {
+            margin-top: 1.25rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            border: 1px dashed var(--border);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Barra de Sessão -->
+        <div class="top-bar">
+            <div class="user-status" id="userStatusText">
+                <span>👤 Modo visitante</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="login.html" id="btnIrLogin" class="btn-logout"
+                    style="background: var(--primary-light); color: var(--primary); border-color: #c7d2fe;">Fazer
+                    Login</a>
+                <button id="btnSair" class="btn-logout" style="display: none;" onclick="fazerLogout()">Sair</button>
+            </div>
+        </div>
+
+        <header>
+            <h1>Painel de Controle Escolar</h1>
+            <p>Gerenciamento unificado de professores, alunos, turmas e cursos</p>
+        </header>
+
+        <!-- Navegação por Abas -->
+        <nav class="tabs-navigation">
+            <button class="tab-btn active" onclick="trocarAba('professores', this)">👨‍🏫 Professores</button>
+            <button class="tab-btn" onclick="trocarAba('alunos', this)">🎓 Alunos</button>
+            <button class="tab-btn" onclick="trocarAba('turmas', this)">🏫 Turmas</button>
+            <button class="tab-btn" onclick="trocarAba('cursos', this)">📚 Cursos</button>
+        </nav>
+
+        <!-- ================= ABA PROFESSORES ================= -->
+        <div id="abaProfessores" class="tab-content active">
+            <div class="forms-grid">
+                <div class="card" id="formContainerProf">
+                    <div class="card-header">
+                        <div class="card-header-icon">✍️</div>
+                        <h2 id="formTitleProf">Cadastrar Professor</h2>
+                    </div>
+                    <form id="professorForm">
+                        <input type="hidden" id="editIdProf">
+
+                        <div class="form-group">
+                            <label for="nomeProf">Nome Completo</label>
+                            <input type="text" id="nomeProf" required placeholder="Ex: João Silva">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emailProf">E-mail</label>
+                                <input type="email" id="emailProf" required placeholder="Ex: joao@teste.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="cpfProf">CPF (Apenas números)</label>
+                                <input type="text" id="cpfProf" required maxlength="11" placeholder="Ex: 12345678919">
+                            </div>
+                        </div>
+                        <div class="form-group" id="grupoSenhaProf">
+                            <label for="senhaProf">Senha de Acesso</label>
+                            <input type="password" id="senhaProf" required placeholder="Crie uma senha forte">
+                        </div>
+                        <button type="submit" id="btnSubmitProf" class="btn btn-primary">Salvar Professor</button>
+                        <button type="button" id="btnCancelEditProf" class="btn btn-cancel" style="display: none;"
+                            onclick="cancelarEdicaoProf()">Cancelar Edição</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-icon">🔍</div>
+                        <h2>Buscar Professor</h2>
+                    </div>
+                    <form id="buscaProfForm">
+                        <div class="form-group">
+                            <label for="buscaIdProf">ID do Professor</label>
+                            <input type="number" id="buscaIdProf" required placeholder="Ex: 1">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </form>
+                    <div id="resultadoBuscaProf" class="resultado-busca"></div>
+                </div>
+            </div>
+
+            <div class="list-section">
+                <h2>Professores Cadastrados</h2>
+                <div id="listaProfessores"></div>
+            </div>
+        </div>
+
+        <!-- ================= ABA ALUNOS ================= -->
+        <div id="abaAlunos" class="tab-content">
+            <div class="forms-grid">
+                <div class="card" id="formContainerAluno">
+                    <div class="card-header">
+                        <div class="card-header-icon">📝</div>
+                        <h2 id="formTitleAluno">Cadastrar Aluno</h2>
+                    </div>
+                    <form id="alunoForm">
+                        <input type="hidden" id="editIdAluno">
+
+                        <div class="form-group">
+                            <label for="nomeAluno">Nome Completo</label>
+                            <input type="text" id="nomeAluno" required placeholder="Ex: Maria Santos">
+                        </div>
+                        <div class="form-group">
+                            <label for="emailAluno">E-mail</label>
+                            <input type="email" id="emailAluno" required placeholder="Ex: maria@teste.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="enderecoAluno">Endereço</label>
+                            <input type="text" id="enderecoAluno" required placeholder="Ex: Rua A, 123">
+                        </div>
+                        <button type="submit" id="btnSubmitAluno" class="btn btn-primary">Salvar Aluno</button>
+                        <button type="button" id="btnCancelEditAluno" class="btn btn-cancel" style="display: none;"
+                            onclick="cancelarEdicaoAluno()">Cancelar Edição</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-icon">🔍</div>
+                        <h2>Buscar Aluno</h2>
+                    </div>
+                    <form id="buscaAlunoForm">
+                        <div class="form-group">
+                            <label for="buscaIdAluno">ID do Aluno</label>
+                            <input type="number" id="buscaIdAluno" required placeholder="Ex: 1">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </form>
+                    <div id="resultadoBuscaAluno" class="resultado-busca"></div>
+                </div>
+            </div>
+
+            <div class="list-section">
+                <h2>Alunos Cadastrados</h2>
+                <div id="listaAlunos"></div>
+            </div>
+        </div>
+
+        <!-- ================= ABA TURMAS ================= -->
+        <div id="abaTurmas" class="tab-content">
+            <div class="forms-grid">
+                <div class="card" id="formContainerTurma">
+                    <div class="card-header">
+                        <div class="card-header-icon">🏫</div>
+                        <h2 id="formTitleTurma">Cadastrar Turma</h2>
+                    </div>
+                    <form id="turmaForm">
+                        <input type="hidden" id="editIdTurma">
+
+                        <div class="form-group">
+                            <label for="salaTurma">Sala</label>
+                            <input type="text" id="salaTurma" required placeholder="Ex: Sala 101 / Bloco B">
+                        </div>
+                        <div class="form-group">
+                            <label for="turnoTurma">Turno</label>
+                            <input type="text" id="turnoTurma" required placeholder="Ex: Matutino / Noturno">
+                        </div>
+                        <button type="submit" id="btnSubmitTurma" class="btn btn-primary">Salvar Turma</button>
+                        <button type="button" id="btnCancelEditTurma" class="btn btn-cancel" style="display: none;"
+                            onclick="cancelarEdicaoTurma()">Cancelar Edição</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-icon">🔍</div>
+                        <h2>Buscar Turma</h2>
+                    </div>
+                    <form id="buscaTurmaForm">
+                        <div class="form-group">
+                            <label for="buscaIdTurma">ID da Turma</label>
+                            <input type="number" id="buscaIdTurma" required placeholder="Ex: 1">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </form>
+                    <div id="resultadoBuscaTurma" class="resultado-busca"></div>
+                </div>
+            </div>
+
+            <div class="list-section">
+                <h2>Turmas Cadastradas</h2>
+                <div id="listaTurmas"></div>
+            </div>
+        </div>
+
+        <!-- ================= ABA CURSOS ================= -->
+        <div id="abaCursos" class="tab-content">
+            <div class="forms-grid">
+                <div class="card" id="formContainerCurso">
+                    <div class="card-header">
+                        <div class="card-header-icon">📚</div>
+                        <h2 id="formTitleCurso">Cadastrar Curso</h2>
+                    </div>
+                    <form id="cursoForm">
+                        <input type="hidden" id="editIdCurso">
+
+                        <div class="form-group">
+                            <label for="nomeCurso">Nome do Curso</label>
+                            <input type="text" id="nomeCurso" required placeholder="Ex: Desenvolvimento Web Full Stack">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="totAulasCurso">Total de Aulas</label>
+                                <input type="number" id="totAulasCurso" required min="1" placeholder="Ex: 40">
+                            </div>
+                            <div class="form-group">
+                                <label for="cargaCurso">Carga Horária (h)</label>
+                                <input type="number" id="cargaCurso" required min="1" placeholder="Ex: 80">
+                            </div>
+                        </div>
+                        <button type="submit" id="btnSubmitCurso" class="btn btn-primary">Salvar Curso</button>
+                        <button type="button" id="btnCancelEditCurso" class="btn btn-cancel" style="display: none;"
+                            onclick="cancelarEdicaoCurso()">Cancelar Edição</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-icon">🔍</div>
+                        <h2>Buscar Curso</h2>
+                    </div>
+                    <form id="buscaCursoForm">
+                        <div class="form-group">
+                            <label for="buscaIdCurso">ID do Curso</label>
+                            <input type="number" id="buscaIdCurso" required placeholder="Ex: 1">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </form>
+                    <div id="resultadoBuscaCurso" class="resultado-busca"></div>
+                </div>
+            </div>
+
+            <div class="list-section">
+                <h2>Cursos Cadastrados</h2>
+                <div id="listaCursos"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- VERIFICAÇÃO DE LOGIN ---
+        const usuarioLogado = localStorage.getItem('professorLogado');
+        const urlParams = new URLSearchParams(window.location.search);
+        const modoCadastroInicial = urlParams.get('cadastro') === 'true';
+
+        if (!usuarioLogado && !modoCadastroInicial) {
+            window.location.href = 'login.html';
+        } else if (usuarioLogado) {
+            document.getElementById('userStatusText').innerHTML = `<span>🟢 Conectado como: <strong>${usuarioLogado}</strong></span>`;
+            document.getElementById('btnSair').style.display = 'inline-block';
+            document.getElementById('btnIrLogin').style.display = 'none';
+        }
+
+        function fazerLogout() {
+            localStorage.removeItem('professorLogado');
+            window.location.href = 'login.html';
+        }
+
+        // URLs das APIs Spring Boot
+        const API_PROFESSOR = 'http://localhost:8080/professor';
+        const API_ALUNO = 'http://localhost:8080/alunos';
+        const API_TURMA = 'http://localhost:8080/turma';
+        const API_CURSO = 'http://localhost:8080/curso';
+
+        // --- NAVEGAÇÃO DE ABAS ---
+        function trocarAba(aba, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            if (aba === 'professores') {
+                document.getElementById('abaProfessores').classList.add('active');
+                listarProfessores();
+            } else if (aba === 'alunos') {
+                document.getElementById('abaAlunos').classList.add('active');
+                listarAlunos();
+            } else if (aba === 'turmas') {
+                document.getElementById('abaTurmas').classList.add('active');
+                listarTurmas();
+            } else if (aba === 'cursos') {
+                document.getElementById('abaCursos').classList.add('active');
+                listarCursos();
+            }
+            btn.classList.add('active');
+        }
+
+        // ==========================================
+        // MÓDULO PROFESSORES
+        // ==========================================
+        const profForm = document.getElementById('professorForm');
+        const formTitleProf = document.getElementById('formTitleProf');
+        const btnSubmitProf = document.getElementById('btnSubmitProf');
+        const btnCancelEditProf = document.getElementById('btnCancelEditProf');
+        const editIdProfInput = document.getElementById('editIdProf');
+        const grupoSenhaProf = document.getElementById('grupoSenhaProf');
+        const senhaProfInput = document.getElementById('senhaProf');
+        const buscaProfForm = document.getElementById('buscaProfForm');
+        const resultadoBuscaProf = document.getElementById('resultadoBuscaProf');
+        const listaProfContainer = document.getElementById('listaProfessores');
+
+        async function listarProfessores() {
+            try {
+                const response = await fetch(`${API_PROFESSOR}/listar`);
+                if (!response.ok) throw new Error('Erro ao buscar professores');
+                const professores = await response.json();
+
+                listaProfContainer.innerHTML = '';
+
+                if (professores.length === 0) {
+                    listaProfContainer.innerHTML = '<div class="empty-state"><p>Nenhum professor cadastrado até o momento.</p></div>';
+                    return;
+                }
+
+                professores.forEach(prof => {
+                    const idProf = prof.idProfessor;
+
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.innerHTML = `
+                        <div class="item-info-block">
+                            <div class="item-name">
+                                ${prof.nome} 
+                                <span class="badge-id">ID: ${idProf || '?'}</span>
+                            </div>
+                            <div class="item-details">
+                                <span>📧 ${prof.email}</span>
+                                <span>🪪 CPF: ${prof.cpf}</span>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-edit" onclick="prepararEdicaoProf('${idProf}', '${prof.nome}', '${prof.email}', '${prof.cpf}')">Editar</button>
+                            <button class="btn btn-sm btn-delete" onclick="deletarProfessor('${idProf}')">Excluir</button>
+                        </div>
+                    `;
+                    listaProfContainer.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Erro:', error);
+                listaProfContainer.innerHTML = '<div class="empty-state"><p style="color: var(--danger);">Erro ao carregar a lista de professores.</p></div>';
+            }
+        }
+
+        profForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = editIdProfInput.value;
+            const dados = {
+                nome: document.getElementById('nomeProf').value,
+                email: document.getElementById('emailProf').value,
+                cpf: document.getElementById('cpfProf').value
+            };
+
+            if (!id) {
+                dados.senha = senhaProfInput.value;
+            }
+
+            try {
+                let response;
+                if (id) {
+                    response = await fetch(`${API_PROFESSOR}/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dados)
+                    });
+                } else {
+                    response = await fetch(`${API_PROFESSOR}/cadastrar`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dados)
+                    });
+                }
+
+                const resultado = await response.json();
+                if (response.status === 201 || response.status === 200) {
+                    alert(resultado.mensagem || (id ? 'Professor alterado com sucesso!' : 'Professor cadastrado com sucesso!'));
+                    cancelarEdicaoProf();
+                    listarProfessores();
+                } else if (response.status === 409) {
+                    alert(resultado.mensagem || 'E-mail já cadastrado ou senha inválida.');
+                } else {
+                    alert(resultado.mensagem || 'Erro ao processar requisição.');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao conectar com a API.');
+            }
+        });
+
+        function prepararEdicaoProf(id, nome, email, cpf) {
+            editIdProfInput.value = id;
+            document.getElementById('nomeProf').value = nome;
+            document.getElementById('emailProf').value = email;
+            document.getElementById('cpfProf').value = cpf;
+
+            // Oculta o campo senha na edição pois o atualizarProfessor no Java não altera senha
+            grupoSenhaProf.style.display = 'none';
+            senhaProfInput.required = false;
+
+            formTitleProf.textContent = `Editar Professor (#${id})`;
+            btnSubmitProf.textContent = 'Atualizar Professor';
+            btnCancelEditProf.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelarEdicaoProf() {
+            editIdProfInput.value = '';
+            profForm.reset();
+            grupoSenhaProf.style.display = 'block';
+            senhaProfInput.required = true;
+            formTitleProf.textContent = 'Cadastrar Professor';
+            btnSubmitProf.textContent = 'Salvar Professor';
+            btnCancelEditProf.style.display = 'none';
+        }
+
+        buscaProfForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('buscaIdProf').value;
+            resultadoBuscaProf.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_PROFESSOR}/${id}`);
+                const data = await response.json();
+
+                if (response.status === 200) {
+                    const idEncontrado = data.idProfessor || id;
+                    resultadoBuscaProf.innerHTML = `
+                        <div class="item-card" style="margin-top: 0.5rem;">
+                            <div class="item-info-block">
+                                <div class="item-name">${data.nome} <span class="badge-id">ID: ${idEncontrado}</span></div>
+                                <div class="item-details">
+                                    <span>📧 ${data.email}</span>
+                                    <span>🪪 CPF: ${data.cpf}</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-edit" onclick="prepararEdicaoProf('${idEncontrado}', '${data.nome}', '${data.email}', '${data.cpf}')">Editar</button>
+                        </div>
+                    `;
+                } else {
+                    resultadoBuscaProf.innerHTML = `<p style="color: var(--danger); font-size: 0.9rem;">${data.mensagem || 'Professor não encontrado'}</p>`;
+                }
+            } catch (error) {
+                resultadoBuscaProf.innerHTML = '<p style="color: var(--danger); font-size: 0.9rem;">Erro ao conectar à API.</p>';
+            }
+        });
+
+        async function deletarProfessor(id) {
+            if (!confirm(`Deseja excluir o professor ID ${id}?`)) return;
+            try {
+                const response = await fetch(`${API_PROFESSOR}/${id}`, { method: 'DELETE' });
+                const res = await response.json();
+                alert(res.mensagem || 'Professor excluído!');
+                listarProfessores();
+            } catch (error) {
+                alert('Erro ao excluir.');
+            }
+        }
+
+        // ==========================================
+        // MÓDULO ALUNOS
+        // ==========================================
+        const alunoForm = document.getElementById('alunoForm');
+        const formTitleAluno = document.getElementById('formTitleAluno');
+        const btnSubmitAluno = document.getElementById('btnSubmitAluno');
+        const btnCancelEditAluno = document.getElementById('btnCancelEditAluno');
+        const editIdAlunoInput = document.getElementById('editIdAluno');
+        const buscaAlunoForm = document.getElementById('buscaAlunoForm');
+        const resultadoBuscaAluno = document.getElementById('resultadoBuscaAluno');
+        const listaAlunoContainer = document.getElementById('listaAlunos');
+
+        async function listarAlunos() {
+            try {
+                const response = await fetch(`${API_ALUNO}/listar`);
+                if (!response.ok) throw new Error('Erro ao buscar alunos');
+                const alunos = await response.json();
+
+                listaAlunoContainer.innerHTML = '';
+
+                if (alunos.length === 0) {
+                    listaAlunoContainer.innerHTML = '<div class="empty-state"><p>Nenhum aluno cadastrado até o momento.</p></div>';
+                    return;
+                }
+
+                alunos.forEach(aluno => {
+                    const idAluno = aluno.idAluno;
+
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.innerHTML = `
+                        <div class="item-info-block">
+                            <div class="item-name">
+                                ${aluno.nome || '-'} 
+                                <span class="badge-id">ID: ${idAluno || '?'}</span>
+                            </div>
+                            <div class="item-details">
+                                <span>📧 ${aluno.email || '-'}</span>
+                                <span>🏠 ${aluno.endereco || '-'}</span>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-edit" onclick="prepararEdicaoAluno('${idAluno}', '${aluno.nome}', '${aluno.email}', '${aluno.endereco}')">Editar</button>
+                            <button class="btn btn-sm btn-delete" onclick="deletarAluno('${idAluno}')">Excluir</button>
+                        </div>
+                    `;
+                    listaAlunoContainer.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Erro:', error);
+                listaAlunoContainer.innerHTML = '<div class="empty-state"><p style="color: var(--danger);">Erro ao carregar a lista de alunos.</p></div>';
+            }
+        }
+
+        alunoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = editIdAlunoInput.value;
+            const dados = {
+                idAluno: id ? parseInt(id) : null,
+                nome: document.getElementById('nomeAluno').value,
+                email: document.getElementById('emailAluno').value,
+                endereco: document.getElementById('enderecoAluno').value
+            };
+
+            try {
+                let response;
+                if (id) {
+                    response = await fetch(`${API_ALUNO}/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dados)
+                    });
+                } else {
+                    response = await fetch(`${API_ALUNO}/cadastrar`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dados)
+                    });
+                }
+
+                if (response.ok || response.status === 201) {
+                    alert(id ? 'Aluno alterado com sucesso!' : 'Aluno cadastrado com sucesso!');
+                    cancelarEdicaoAluno();
+                    listarAlunos();
+                } else {
+                    alert('Erro ao processar requisição.');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao conectar com a API.');
+            }
+        });
+
+        function prepararEdicaoAluno(id, nome, email, endereco) {
+            editIdAlunoInput.value = id;
+            document.getElementById('nomeAluno').value = nome;
+            document.getElementById('emailAluno').value = email;
+            document.getElementById('enderecoAluno').value = endereco;
+
+            formTitleAluno.textContent = `Editar Aluno (#${id})`;
+            btnSubmitAluno.textContent = 'Atualizar Aluno';
+            btnCancelEditAluno.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelarEdicaoAluno() {
+            editIdAlunoInput.value = '';
+            alunoForm.reset();
+            formTitleAluno.textContent = 'Cadastrar Aluno';
+            btnSubmitAluno.textContent = 'Salvar Aluno';
+            btnCancelEditAluno.style.display = 'none';
+        }
+
+        buscaAlunoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('buscaIdAluno').value;
+            resultadoBuscaAluno.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_ALUNO}/${id}`);
+                const data = await response.json();
+
+                if (response.status === 200) {
+                    resultadoBuscaAluno.innerHTML = `
+                        <div class="item-card" style="margin-top: 0.5rem;">
+                            <div class="item-info-block">
+                                <div class="item-name">${data.nome} <span class="badge-id">ID: ${data.idAluno || id}</span></div>
+                                <div class="item-details">
+                                    <span>📧 ${data.email}</span>
+                                    <span>🏠 ${data.endereco}</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-edit" onclick="prepararEdicaoAluno('${data.idAluno || id}', '${data.nome}', '${data.email}', '${data.endereco}')">Editar</button>
+                        </div>
+                    `;
+                } else {
+                    resultadoBuscaAluno.innerHTML = `<p style="color: var(--danger); font-size: 0.9rem;">${data.mensagem || 'Aluno não encontrado'}</p>`;
+                }
+            } catch (error) {
+                resultadoBuscaAluno.innerHTML = '<p style="color: var(--danger); font-size: 0.9rem;">Erro ao conectar à API.</p>';
+            }
+        });
+
+        async function deletarAluno(id) {
+            if (!confirm(`Deseja excluir o aluno ID ${id}?`)) return;
+            try {
+                const response = await fetch(`${API_ALUNO}/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert('Aluno excluído com sucesso!');
+                    listarAlunos();
+                } else {
+                    const res = await response.json();
+                    alert(res.mensagem || 'Erro ao excluir aluno.');
+                }
+            } catch (error) {
+                alert('Erro ao tentar deletar aluno.');
+            }
+        }
+
+        // ==========================================
+        // MÓDULO TURMAS
+        // ==========================================
+        const turmaForm = document.getElementById('turmaForm');
+        const formTitleTurma = document.getElementById('formTitleTurma');
+        const btnSubmitTurma = document.getElementById('btnSubmitTurma');
+        const btnCancelEditTurma = document.getElementById('btnCancelEditTurma');
+        const editIdTurmaInput = document.getElementById('editIdTurma');
+        const buscaTurmaForm = document.getElementById('buscaTurmaForm');
+        const resultadoBuscaTurma = document.getElementById('resultadoBuscaTurma');
+        const listaTurmaContainer = document.getElementById('listaTurmas');
+
+        let cacheTurmas = [];
+
+        async function listarTurmas() {
+            try {
+                const response = await fetch(`${API_TURMA}/listar`);
+                if (!response.ok) throw new Error('Erro ao buscar turmas');
+                const turmas = await response.json();
+                cacheTurmas = turmas;
+
+                listaTurmaContainer.innerHTML = '';
+
+                if (turmas.length === 0) {
+                    listaTurmaContainer.innerHTML = '<div class="empty-state"><p>Nenhuma turma cadastrada até o momento.</p></div>';
+                    return;
+                }
+
+                turmas.forEach(turma => {
+                    const idTurma = turma.idTurma;
+
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.innerHTML = `
+                        <div class="item-info-block">
+                            <div class="item-name">
+                                Sala ${turma.sala || '-'} 
+                                <span class="badge-id">ID: ${idTurma || '?'}</span>
+                            </div>
+                            <div class="item-details">
+                                <span>🕒 Turno: ${turma.turno || '-'}</span>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-edit" onclick="prepararEdicaoTurma('${idTurma}', '${turma.sala}', '${turma.turno}')">Editar</button>
+                            <button class="btn btn-sm btn-delete" onclick="deletarTurma('${idTurma}')">Excluir</button>
+                        </div>
+                    `;
+                    listaTurmaContainer.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Erro:', error);
+                listaTurmaContainer.innerHTML = '<div class="empty-state"><p style="color: var(--danger);">Erro ao carregar a lista de turmas.</p></div>';
+            }
+        }
+
+        turmaForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = editIdTurmaInput.value;
+            const dados = {
+                sala: document.getElementById('salaTurma').value,
+                turno: document.getElementById('turnoTurma').value
+            };
+
+            try {
+                let response;
+                if (id) {
+                    response = await fetch(`${API_TURMA}/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dados)
+                    });
+                } else {
+                    response = await fetch(`${API_TURMA}/cadastrar`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dados)
+                    });
+                }
+
+                const resultado = await response.json();
+
+                if (response.status === 201 || response.status === 200) {
+                    alert(resultado.mensagem || (id ? 'Turma atualizada com sucesso!' : 'Turma cadastrada com sucesso!'));
+                    cancelarEdicaoTurma();
+                    listarTurmas();
+                } else {
+                    alert(resultado.mensagem || 'Erro ao processar requisição.');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao conectar com a API.');
+            }
+        });
+
+        function prepararEdicaoTurma(id, sala, turno) {
+            editIdTurmaInput.value = id;
+            document.getElementById('salaTurma').value = sala;
+            document.getElementById('turnoTurma').value = turno;
+
+            formTitleTurma.textContent = `Editar Turma (#${id})`;
+            btnSubmitTurma.textContent = 'Atualizar Turma';
+            btnCancelEditTurma.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelarEdicaoTurma() {
+            editIdTurmaInput.value = '';
+            turmaForm.reset();
+            formTitleTurma.textContent = 'Cadastrar Turma';
+            btnSubmitTurma.textContent = 'Salvar Turma';
+            btnCancelEditTurma.style.display = 'none';
+        }
+
+        buscaTurmaForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('buscaIdTurma').value);
+            resultadoBuscaTurma.innerHTML = '';
+
+            try {
+                if (cacheTurmas.length === 0) {
+                    const response = await fetch(`${API_TURMA}/listar`);
+                    if (response.ok) cacheTurmas = await response.json();
+                }
+
+                const turmaEncontrada = cacheTurmas.find(t => t.idTurma === id);
+
+                if (turmaEncontrada) {
+                    resultadoBuscaTurma.innerHTML = `
+                        <div class="item-card" style="margin-top: 0.5rem;">
+                            <div class="item-info-block">
+                                <div class="item-name">Sala ${turmaEncontrada.sala} <span class="badge-id">ID: ${turmaEncontrada.idTurma}</span></div>
+                                <div class="item-details">
+                                    <span>🕒 Turno: ${turmaEncontrada.turno}</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-edit" onclick="prepararEdicaoTurma('${turmaEncontrada.idTurma}', '${turmaEncontrada.sala}', '${turmaEncontrada.turno}')">Editar</button>
+                        </div>
+                    `;
+                } else {
+                    resultadoBuscaTurma.innerHTML = '<p style="color: var(--danger); font-size: 0.9rem;">Turma não encontrada.</p>';
+                }
+            } catch (error) {
+                resultadoBuscaTurma.innerHTML = '<p style="color: var(--danger); font-size: 0.9rem;">Erro ao buscar turma.</p>';
+            }
+        });
+
+        async function deletarTurma(id) {
+            if (!confirm(`Deseja excluir a turma ID ${id}?`)) return;
+            try {
+                const response = await fetch(`${API_TURMA}/${id}`, { method: 'DELETE' });
+                const res = await response.json();
+                if (response.status === 200) {
+                    alert(res.mensagem || 'Turma excluída com sucesso!');
+                    listarTurmas();
+                } else {
+                    alert(res.mensagem || 'Turma não existe.');
+                }
+            } catch (error) {
+                alert('Erro ao tentar deletar turma.');
+            }
+        }
+
+        // ==========================================
+        // MÓDULO CURSOS
+        // ==========================================
+        const cursoForm = document.getElementById('cursoForm');
+        const formTitleCurso = document.getElementById('formTitleCurso');
+        const btnSubmitCurso = document.getElementById('btnSubmitCurso');
+        const btnCancelEditCurso = document.getElementById('btnCancelEditCurso');
+        const editIdCursoInput = document.getElementById('editIdCurso');
+        const buscaCursoForm = document.getElementById('buscaCursoForm');
+        const resultadoBuscaCurso = document.getElementById('resultadoBuscaCurso');
+        const listaCursoContainer = document.getElementById('listaCursos');
+
+        let cacheCursos = [];
+
+        async function listarCursos() {
+            try {
+                const response = await fetch(`${API_CURSO}/listar`);
+                if (!response.ok) throw new Error('Erro ao buscar cursos');
+                const cursos = await response.json();
+                cacheCursos = cursos;
+
+                listaCursoContainer.innerHTML = '';
+
+                if (cursos.length === 0) {
+                    listaCursoContainer.innerHTML = '<div class="empty-state"><p>Nenhum curso cadastrado até o momento.</p></div>';
+                    return;
+                }
+
+                cursos.forEach(curso => {
+                    const idCurso = curso.idCurso;
+
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.innerHTML = `
+                        <div class="item-info-block">
+                            <div class="item-name">
+                                ${curso.nome || '-'} 
+                                <span class="badge-id">ID: ${idCurso || '?'}</span>
+                            </div>
+                            <div class="item-details">
+                                <span>📖 Total de Aulas: ${curso.totAulas || 0}</span>
+                                <span>⏱️ Carga Horária: ${curso.carga || 0}h</span>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-edit" onclick="prepararEdicaoCurso('${idCurso}', '${curso.nome}', '${curso.totAulas}', '${curso.carga}')">Editar</button>
+                            <button class="btn btn-sm btn-delete" onclick="deletarCurso('${idCurso}')">Excluir</button>
+                        </div>
+                    `;
+                    listaCursoContainer.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Erro:', error);
+                listaCursoContainer.innerHTML = '<div class="empty-state"><p style="color: var(--danger);">Erro ao carregar a lista de cursos.</p></div>';
+            }
+        }
+
+        cursoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = editIdCursoInput.value;
+            const dados = {
+                nome: document.getElementById('nomeCurso').value,
+                totAulas: parseInt(document.getElementById('totAulasCurso').value),
+                carga: parseInt(document.getElementById('cargaCurso').value)
+            };
+
+            try {
+                let response;
+                if (id) {
+                    response = await fetch(`${API_CURSO}/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dados)
+                    });
+                } else {
+                    response = await fetch(`${API_CURSO}/cadastrar`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dados)
+                    });
+                }
+
+                const resultado = await response.json();
+
+                if (response.status === 201 || response.status === 200) {
+                    alert(resultado.mensagem || (id ? 'Curso atualizado com sucesso!' : 'Curso cadastrado com sucesso!'));
+                    cancelarEdicaoCurso();
+                    listarCursos();
+                } else {
+                    alert(resultado.mensagem || 'Erro ao processar requisição.');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao conectar com a API.');
+            }
+        });
+
+        function prepararEdicaoCurso(id, nome, totAulas, carga) {
+            editIdCursoInput.value = id;
+            document.getElementById('nomeCurso').value = nome;
+            document.getElementById('totAulasCurso').value = totAulas;
+            document.getElementById('cargaCurso').value = carga;
+
+            formTitleCurso.textContent = `Editar Curso (#${id})`;
+            btnSubmitCurso.textContent = 'Atualizar Curso';
+            btnCancelEditCurso.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelarEdicaoCurso() {
+            editIdCursoInput.value = '';
+            cursoForm.reset();
+            formTitleCurso.textContent = 'Cadastrar Curso';
+            btnSubmitCurso.textContent = 'Salvar Curso';
+            btnCancelEditCurso.style.display = 'none';
+        }
+
+        buscaCursoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('buscaIdCurso').value);
+            resultadoBuscaCurso.innerHTML = '';
+
+            try {
+                if (cacheCursos.length === 0) {
+                    const response = await fetch(`${API_CURSO}/listar`);
+                    if (response.ok) cacheCursos = await response.json();
+                }
+
+                const cursoEncontrado = cacheCursos.find(c => c.idCurso === id);
+
+                if (cursoEncontrado) {
+                    resultadoBuscaCurso.innerHTML = `
+                        <div class="item-card" style="margin-top: 0.5rem;">
+                            <div class="item-info-block">
+                                <div class="item-name">${cursoEncontrado.nome} <span class="badge-id">ID: ${cursoEncontrado.idCurso}</span></div>
+                                <div class="item-details">
+                                    <span>📖 Aulas: ${cursoEncontrado.totAulas}</span>
+                                    <span>⏱️ Carga: ${cursoEncontrado.carga}h</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-edit" onclick="prepararEdicaoCurso('${cursoEncontrado.idCurso}', '${cursoEncontrado.nome}', '${cursoEncontrado.totAulas}', '${cursoEncontrado.carga}')">Editar</button>
+                        </div>
+                    `;
+                } else {
+                    resultadoBuscaCurso.innerHTML = '<p style="color: var(--danger); font-size: 0.9rem;">Curso não encontrado.</p>';
+                }
+            } catch (error) {
+                resultadoBuscaCurso.innerHTML = '<p style="color: var(--danger); font-size: 0.9rem;">Erro ao buscar curso.</p>';
+            }
+        });
+
+        async function deletarCurso(id) {
+            if (!confirm(`Deseja excluir o curso ID ${id}?`)) return;
+            try {
+                const response = await fetch(`${API_CURSO}/${id}`, { method: 'DELETE' });
+                const res = await response.json();
+                if (response.status === 200) {
+                    alert(res.mensagem || 'Curso excluído com sucesso!');
+                    listarCursos();
+                } else {
+                    alert(res.mensagem || 'Curso não existe.');
+                }
+            } catch (error) {
+                alert('Erro ao tentar deletar curso.');
+            }
+        }
+
+        // Inicializa listando os professores ao abrir
+        listarProfessores();
+    </script>
+</body>
+
+</html>
