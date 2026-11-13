@@ -22,6 +22,7 @@
             --border: #e2e8f0;
             --radius-md: 16px;
             --radius-sm: 8px;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
         }
 
@@ -45,7 +46,7 @@
         .login-card {
             background: var(--surface);
             width: 100%;
-            max-width: 420px;
+            max-width: 430px;
             padding: 2.5rem 2rem;
             border-radius: var(--radius-md);
             box-shadow: var(--shadow-lg);
@@ -54,7 +55,7 @@
 
         .login-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .login-icon {
@@ -68,6 +69,7 @@
             justify-content: center;
             font-size: 1.75rem;
             margin-bottom: 1rem;
+            transition: all 0.2s ease;
         }
 
         .login-header h1 {
@@ -81,6 +83,35 @@
             color: var(--text-muted);
             font-size: 0.9rem;
             margin-top: 0.35rem;
+        }
+
+        /* Seletor de Perfil (Professor / Aluno) */
+        .role-selector {
+            display: flex;
+            background: #f1f5f9;
+            padding: 0.3rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 0.6rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .role-btn.active {
+            background: var(--surface);
+            color: var(--primary);
+            box-shadow: var(--shadow);
         }
 
         .form-group {
@@ -177,9 +208,16 @@
 
     <div class="login-card">
         <div class="login-header">
-            <div class="login-icon">🔐</div>
-            <h1>Acesso do Professor</h1>
-            <p>Entre com suas credenciais para gerenciar o sistema</p>
+            <div class="login-icon" id="loginIcon">👨‍🏫</div>
+            <h1 id="loginTitle">Acesso do Professor</h1>
+            <p id="loginSubtitle">Entre com suas credenciais para gerenciar o sistema</p>
+        </div>
+
+        <!-- Seletor de Perfil -->
+        <div class="role-selector">
+            <button type="button" class="role-btn active" onclick="selecionarPerfil('professor', this)">👨‍🏫
+                Professor</button>
+            <button type="button" class="role-btn" onclick="selecionarPerfil('aluno', this)">🎓 Aluno</button>
         </div>
 
         <div id="alertErro" class="alert-error"></div>
@@ -195,20 +233,54 @@
                 <input type="password" id="senha" required placeholder="••••••••" autocomplete="current-password">
             </div>
 
-            <button type="submit" id="btnEntrar" class="btn-login">Entrar no Painel</button>
+            <button type="submit" id="btnEntrar" class="btn-login">Entrar como Professor</button>
         </form>
 
         <div class="footer-link">
-            Ainda não tem conta? <a href="painel.html?cadastro=true">Ir para o cadastro</a>
+            Ainda não tem conta? <a id="linkCadastro" href="painel.html?cadastro=professor">Cadastrar Professor</a>
         </div>
     </div>
 
     <script>
-        const API_LOGIN = 'http://localhost:8080/professor/login';
+        let perfilAtual = 'professor';
 
         // Se já estiver autenticado, redireciona direto para o painel
-        if (localStorage.getItem('professorLogado')) {
+        if (localStorage.getItem('usuarioLogado')) {
             window.location.href = 'painel.html';
+        }
+
+        function selecionarPerfil(perfil, btn) {
+            perfilAtual = perfil;
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const loginIcon = document.getElementById('loginIcon');
+            const loginTitle = document.getElementById('loginTitle');
+            const loginSubtitle = document.getElementById('loginSubtitle');
+            const emailInput = document.getElementById('email');
+            const btnEntrar = document.getElementById('btnEntrar');
+            const linkCadastro = document.getElementById('linkCadastro');
+            const alertErro = document.getElementById('alertErro');
+
+            alertErro.style.display = 'none';
+
+            if (perfil === 'professor') {
+                loginIcon.textContent = '👨‍🏫';
+                loginTitle.textContent = 'Acesso do Professor';
+                loginSubtitle.textContent = 'Entre com suas credenciais para gerenciar o sistema';
+                emailInput.placeholder = 'professor@escola.com';
+                btnEntrar.textContent = 'Entrar como Professor';
+                linkCadastro.href = 'painel.html?cadastro=professor';
+                linkCadastro.textContent = 'Cadastrar Professor';
+            } else {
+                loginIcon.textContent = '🎓';
+                loginTitle.textContent = 'Acesso do Aluno';
+                loginSubtitle.textContent = 'Entre com seu e-mail e senha de estudante';
+                emailInput.placeholder = 'aluno@escola.com';
+                btnEntrar.textContent = 'Entrar como Aluno';
+                linkCadastro.href = 'painel.html?cadastro=aluno';
+                linkCadastro.textContent = 'Cadastrar Aluno';
+            }
         }
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -216,6 +288,10 @@
 
             const btnEntrar = document.getElementById('btnEntrar');
             const alertErro = document.getElementById('alertErro');
+
+            const endpoint = perfilAtual === 'professor'
+                ? 'http://localhost:8080/professor/login'
+                : 'http://localhost:8080/alunos/login';
 
             const credenciais = {
                 email: document.getElementById('email').value,
@@ -227,7 +303,7 @@
             btnEntrar.textContent = 'Autenticando...';
 
             try {
-                const response = await fetch(API_LOGIN, {
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(credenciais)
@@ -236,8 +312,8 @@
                 const data = await response.json();
 
                 if (response.status === 200) {
-                    // Salva sessão simples no navegador e redireciona
-                    localStorage.setItem('professorLogado', credenciais.email);
+                    localStorage.setItem('usuarioLogado', credenciais.email);
+                    localStorage.setItem('perfilLogado', perfilAtual);
                     window.location.href = 'painel.html';
                 } else {
                     alertErro.textContent = data.mensagem || 'E-mail ou senha inválidos.';
@@ -249,7 +325,7 @@
                 alertErro.style.display = 'block';
             } finally {
                 btnEntrar.disabled = false;
-                btnEntrar.textContent = 'Entrar no Painel';
+                btnEntrar.textContent = perfilAtual === 'professor' ? 'Entrar como Professor' : 'Entrar como Aluno';
             }
         });
     </script>

@@ -76,6 +76,16 @@
             color: var(--text-main);
         }
 
+        .badge-role {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
         .btn-logout {
             background-color: #fef2f2;
             color: var(--danger-hover);
@@ -399,7 +409,7 @@
                 <span>👤 Modo visitante</span>
             </div>
             <div style="display: flex; gap: 0.5rem;">
-                <a href="login.html" id="btnIrLogin" class="btn-logout"
+                <a href="index.html" id="btnIrLogin" class="btn-logout"
                     style="background: var(--primary-light); color: var(--primary); border-color: #c7d2fe;">Fazer
                     Login</a>
                 <button id="btnSair" class="btn-logout" style="display: none;" onclick="fazerLogout()">Sair</button>
@@ -413,10 +423,11 @@
 
         <!-- Navegação por Abas -->
         <nav class="tabs-navigation">
-            <button class="tab-btn active" onclick="trocarAba('professores', this)">👨‍🏫 Professores</button>
-            <button class="tab-btn" onclick="trocarAba('alunos', this)">🎓 Alunos</button>
-            <button class="tab-btn" onclick="trocarAba('turmas', this)">🏫 Turmas</button>
-            <button class="tab-btn" onclick="trocarAba('cursos', this)">📚 Cursos</button>
+            <button class="tab-btn active" id="tabBtnProfessores" onclick="trocarAba('professores', this)">👨‍🏫
+                Professores</button>
+            <button class="tab-btn" id="tabBtnAlunos" onclick="trocarAba('alunos', this)">🎓 Alunos</button>
+            <button class="tab-btn" id="tabBtnTurmas" onclick="trocarAba('turmas', this)">🏫 Turmas</button>
+            <button class="tab-btn" id="tabBtnCursos" onclick="trocarAba('cursos', this)">📚 Cursos</button>
         </nav>
 
         <!-- ================= ABA PROFESSORES ================= -->
@@ -491,13 +502,19 @@
                             <label for="nomeAluno">Nome Completo</label>
                             <input type="text" id="nomeAluno" required placeholder="Ex: Maria Santos">
                         </div>
-                        <div class="form-group">
-                            <label for="emailAluno">E-mail</label>
-                            <input type="email" id="emailAluno" required placeholder="Ex: maria@teste.com">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emailAluno">E-mail</label>
+                                <input type="email" id="emailAluno" required placeholder="Ex: maria@teste.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="enderecoAluno">Endereço</label>
+                                <input type="text" id="enderecoAluno" required placeholder="Ex: Rua A, 123">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="enderecoAluno">Endereço</label>
-                            <input type="text" id="enderecoAluno" required placeholder="Ex: Rua A, 123">
+                        <div class="form-group" id="grupoSenhaAluno">
+                            <label for="senhaAluno">Senha de Acesso</label>
+                            <input type="password" id="senhaAluno" required placeholder="Crie uma senha forte">
                         </div>
                         <button type="submit" id="btnSubmitAluno" class="btn btn-primary">Salvar Aluno</button>
                         <button type="button" id="btnCancelEditAluno" class="btn btn-cancel" style="display: none;"
@@ -629,24 +646,6 @@
     </div>
 
     <script>
-        // --- VERIFICAÇÃO DE LOGIN ---
-        const usuarioLogado = localStorage.getItem('professorLogado');
-        const urlParams = new URLSearchParams(window.location.search);
-        const modoCadastroInicial = urlParams.get('cadastro') === 'true';
-
-        if (!usuarioLogado && !modoCadastroInicial) {
-            window.location.href = 'login.html';
-        } else if (usuarioLogado) {
-            document.getElementById('userStatusText').innerHTML = `<span>🟢 Conectado como: <strong>${usuarioLogado}</strong></span>`;
-            document.getElementById('btnSair').style.display = 'inline-block';
-            document.getElementById('btnIrLogin').style.display = 'none';
-        }
-
-        function fazerLogout() {
-            localStorage.removeItem('professorLogado');
-            window.location.href = 'login.html';
-        }
-
         // URLs das APIs Spring Boot
         const API_PROFESSOR = 'http://localhost:8080/professor';
         const API_ALUNO = 'http://localhost:8080/alunos';
@@ -671,7 +670,31 @@
                 document.getElementById('abaCursos').classList.add('active');
                 listarCursos();
             }
-            btn.classList.add('active');
+            if (btn) btn.classList.add('active');
+        }
+
+        // --- VERIFICAÇÃO DE LOGIN ---
+        const usuarioLogado = localStorage.getItem('usuarioLogado');
+        const perfilLogado = localStorage.getItem('perfilLogado') || 'professor';
+        const urlParams = new URLSearchParams(window.location.search);
+        const modoCadastro = urlParams.get('cadastro'); // 'professor', 'aluno' ou null
+
+        if (!usuarioLogado && !modoCadastro) {
+            window.location.href = 'index.html';
+        } else if (usuarioLogado) {
+            const labelPerfil = perfilLogado === 'aluno' ? 'Aluno' : 'Professor';
+            document.getElementById('userStatusText').innerHTML = `
+                <span>🟢 Conectado como: <strong>${usuarioLogado}</strong></span>
+                <span class="badge-role">${labelPerfil}</span>
+            `;
+            document.getElementById('btnSair').style.display = 'inline-block';
+            document.getElementById('btnIrLogin').style.display = 'none';
+        }
+
+        function fazerLogout() {
+            localStorage.removeItem('usuarioLogado');
+            localStorage.removeItem('perfilLogado');
+            window.location.href = 'index.html';
         }
 
         // ==========================================
@@ -781,7 +804,6 @@
             document.getElementById('emailProf').value = email;
             document.getElementById('cpfProf').value = cpf;
 
-            // Oculta o campo senha na edição pois o atualizarProfessor no Java não altera senha
             grupoSenhaProf.style.display = 'none';
             senhaProfInput.required = false;
 
@@ -852,6 +874,8 @@
         const btnSubmitAluno = document.getElementById('btnSubmitAluno');
         const btnCancelEditAluno = document.getElementById('btnCancelEditAluno');
         const editIdAlunoInput = document.getElementById('editIdAluno');
+        const grupoSenhaAluno = document.getElementById('grupoSenhaAluno');
+        const senhaAlunoInput = document.getElementById('senhaAluno');
         const buscaAlunoForm = document.getElementById('buscaAlunoForm');
         const resultadoBuscaAluno = document.getElementById('resultadoBuscaAluno');
         const listaAlunoContainer = document.getElementById('listaAlunos');
@@ -908,6 +932,10 @@
                 endereco: document.getElementById('enderecoAluno').value
             };
 
+            if (!id) {
+                dados.senha = senhaAlunoInput.value;
+            }
+
             try {
                 let response;
                 if (id) {
@@ -924,12 +952,16 @@
                     });
                 }
 
+                const resultado = await response.json();
+
                 if (response.ok || response.status === 201) {
-                    alert(id ? 'Aluno alterado com sucesso!' : 'Aluno cadastrado com sucesso!');
+                    alert(resultado.mensagem || (id ? 'Aluno alterado com sucesso!' : 'Aluno cadastrado com sucesso!'));
                     cancelarEdicaoAluno();
                     listarAlunos();
+                } else if (response.status === 409) {
+                    alert(resultado.mensagem || 'E-mail já cadastrado ou senha inválida.');
                 } else {
-                    alert('Erro ao processar requisição.');
+                    alert(resultado.mensagem || 'Erro ao processar requisição.');
                 }
             } catch (error) {
                 console.error('Erro:', error);
@@ -943,6 +975,9 @@
             document.getElementById('emailAluno').value = email;
             document.getElementById('enderecoAluno').value = endereco;
 
+            grupoSenhaAluno.style.display = 'none';
+            senhaAlunoInput.required = false;
+
             formTitleAluno.textContent = `Editar Aluno (#${id})`;
             btnSubmitAluno.textContent = 'Atualizar Aluno';
             btnCancelEditAluno.style.display = 'block';
@@ -952,6 +987,8 @@
         function cancelarEdicaoAluno() {
             editIdAlunoInput.value = '';
             alunoForm.reset();
+            grupoSenhaAluno.style.display = 'block';
+            senhaAlunoInput.required = true;
             formTitleAluno.textContent = 'Cadastrar Aluno';
             btnSubmitAluno.textContent = 'Salvar Aluno';
             btnCancelEditAluno.style.display = 'none';
@@ -1333,8 +1370,12 @@
             }
         }
 
-        // Inicializa listando os professores ao abrir
-        listarProfessores();
+        // Inicializa abrindo a aba correta
+        if (modoCadastro === 'aluno' || (usuarioLogado && perfilLogado === 'aluno')) {
+            trocarAba('alunos', document.getElementById('tabBtnAlunos'));
+        } else {
+            listarProfessores();
+        }
     </script>
 </body>
 
